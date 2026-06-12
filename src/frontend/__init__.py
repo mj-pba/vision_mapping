@@ -1,0 +1,1 @@
+from frontend.main_window import Ui_MainWindow

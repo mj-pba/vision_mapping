@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="24.05.0.0">
+<procedure name="main">
+<interface/>
+<body>
+<c></c>
+<c>* This example shows the usage of the metrology model</c>
+<c>* to measure circles and rectangles with subpixel</c>
+<c>* accuracy under challenging conditions easily.</c>
+<c>* </c>
+<c>* Display initializations</c>
+<l>dev_update_off ()</l>
+<l>read_image (Image, 'Pic_2024_05_30_144018_1')</l>
+<l>get_image_size (Image, Width, Height)</l>
+<c></c>
+<c>* </c>
+<c>* Define the approximate position and the measure</c>
+<c>* tolerance for the circles</c>
+<l>RowCircle := [100]</l>
+<l>CircleInitRow := [RowCircle]</l>
+<l>CircleInitColumn := [2100]</l>
+<c></c>
+<c>* Function to create </c>
+<c>* gen_cross_contour_xld (Cross1, CircleInitRow, CircleInitColumn, sixe of the cross, angle of the cross in radian)</c>
+<c></c>
+<l>gen_cross_contour_xld (Cross1, CircleInitRow, CircleInitColumn, 30, 0.785398)</l>
+<l>CircleInitRadius := [90]</l>
+<c></c>
+<l>*CircleRadiusTolerance := 130</l>
+<c></c>
+<l>CircleRadiusTolerance := 20</l>
+<c></c>
+<c></c>
+<l>create_metrology_model (MetrologyHandle)</l>
+<c></c>
+<l>set_metrology_model_image_size (MetrologyHandle, Width, Height)</l>
+<c></c>
+<l>*add_metrology_object_circle_measure (MetrologyHandle, Y_axis_location , X_axis_location , radius_of_circle, CircleRadiusTolerance, 5, MeasureSigma, 2, [], [], MetrologyCircleIndices)</l>
+<c></c>
+<l>add_metrology_object_circle_measure (MetrologyHandle, RowCircle , CircleInitColumn, CircleInitRadius, CircleRadiusTolerance, 20, 0.5, 1.8, ['measure_distance'], [50], MetrologyCircleIndices)</l>
+<c></c>
+<c></c>
+<l>set_metrology_object_param (MetrologyHandle, MetrologyCircleIndices, 'measure_transition', 'uniform')</l>
+<c></c>
+<l>apply_metrology_model (Image, MetrologyHandle)</l>
+<c></c>
+<l>get_metrology_object_result (MetrologyHandle, MetrologyCircleIndices, 'all', 'result_type', 'all_param', CircleParameter)</l>
+<c></c>
+<c></c>
+<l>Sequence := [0:5:|CircleParameter| - 1]</l>
+<l>CircleRow := CircleParameter[Sequence]</l>
+<l>CircleColumn := CircleParameter[Sequence + 1]</l>
+<l>CircleRadius := CircleParameter[Sequence + 2]</l>
+<c></c>
+<l>get_metrology_object_result_contour (result_contours, MetrologyHandle, MetrologyCircleIndices, 'all', 1.5)</l>
+<c></c>
+<c></c>
+<l>get_metrology_object_measures (Contour, MetrologyHandle, 'all', 'all', Row1, Column1)</l>
+<c></c>
+<l>gen_cross_contour_xld (Real_center, CircleRow, CircleColumn, 6, 0.785398)</l>
+<l>gen_cross_contour_xld (Cross, Row1, Column1, 6, 0.785398)</l>
+<c></c>
+<l>*Color := ['gray', 'cyan', 'green']</l>
+<l>dev_display (Image)</l>
+<c></c>
+<c></c>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

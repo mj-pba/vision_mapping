@@ -1,0 +1,11 @@
+parameter,value
+image_width,4096
+image_height,3000
+image_center_pixel_x,2048
+image_center_pixel_y,1500
+circle_radius,87
+circle_radius_tolerance, 30
+pixel_to_mm,0.01146499
+dot_pitch_in_pix,1160
+image_brightness_threshold_value,170
+pixel_to_mm_original,0.0011526

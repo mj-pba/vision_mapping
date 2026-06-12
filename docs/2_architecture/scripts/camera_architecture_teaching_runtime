@@ -1,0 +1,106 @@
+// Camera Architecture - Teaching vs Runtime Modes
+digraph {
+	rankdir=TB size="12,10"
+	node [fillcolor=lightblue shape=box style=filled]
+	title [label="Camera System Architecture
+Teaching vs Runtime Modes" fontsize=16 fontweight=bold]
+	node [fillcolor=lightcoral shape=box style=filled]
+	current [label="Current Implementation
+(Performance Issues)" fontsize=14 fontweight=bold]
+	node [fillcolor=lightyellow shape=box style=filled]
+	webcam [label="Web Camera
+(cam_id=0)"]
+	dahua [label="Dahua Industrial
+(cam_id=1)"]
+	bfs [label="BFS Camera
+(cam_id=1)"]
+	node [fillcolor=lightgray shape=ellipse style=filled]
+	continuous [label="Continuous Frame
+Grabbing"]
+	ui_update [label="UI Update Loop
+collec_frame_from_camer_send_to_UI()"]
+	performance [label="Performance Issues
+• High CPU usage
+• Memory consumption
+• .exe lag"]
+	node [fillcolor=lightgreen shape=box style=filled]
+	teaching [label="TEACHING MODE
+(Live Preview)" fontsize=14 fontweight=bold]
+	teach_features [label="Features:
+• Continuous streaming
+• Real-time UI updates
+• Circle overlay drawing
+• Positioning assistance"]
+	node [fillcolor=lightblue shape=box style=filled]
+	runtime [label="RUNTIME MODE
+(Capture on Demand)" fontsize=14 fontweight=bold]
+	runtime_features [label="Features:
+• Single frame capture
+• Flash-based imaging
+• RAM storage
+• On-demand UI update"]
+	node [fillcolor=wheat shape=diamond style=filled]
+	mode_switch [label="Mode Selector
+UI Control"]
+	camera_manager [label="Camera Manager
+BFS/Dahua/WebCam"]
+	frame_processor [label="Frame Processor
+Circle overlay, scaling"]
+	node [fillcolor=lavender shape=parallelogram style=filled]
+	live_stream [label="Live Stream
+Buffer"]
+	single_capture [label="Single Capture
+RAM Storage"]
+	ui_display [label="UI Display
+QLabel Widget"]
+	title -> current
+	current -> webcam
+	current -> dahua
+	current -> bfs
+	webcam -> continuous
+	dahua -> continuous
+	bfs -> continuous
+	continuous -> ui_update
+	ui_update -> performance
+	title -> mode_switch
+	mode_switch -> teaching
+	mode_switch -> runtime
+	teaching -> teach_features
+	teaching -> camera_manager
+	camera_manager -> live_stream
+	live_stream -> frame_processor
+	frame_processor -> ui_display
+	runtime -> runtime_features
+	runtime -> camera_manager
+	camera_manager -> single_capture
+	single_capture -> frame_processor
+	frame_processor -> ui_display
+	subgraph cluster_classes {
+		color=blue label="Current Class Structure" style=dashed
+		controller [label="UIController
+• camera_frame_update_activation
+• collec_frame_from_camer_send_to_UI()
+• camera_start_button()
+• camera_stop_button()"]
+		bfs_class [label="camera_frame_update_BFS
+• connect_camera()
+• capture_frame()
+• save_frame()
+• relese_camera()"]
+		controller -> bfs_class
+	}
+	subgraph cluster_proposed {
+		color=green label="Proposed Enhanced Structure" style=dashed
+		enhanced_controller [label="Enhanced UIController
+• teaching_mode_active
+• runtime_mode_active
+• switch_camera_mode()
+• capture_on_demand()"]
+		camera_interface [label="Camera Interface
+• start_teaching_mode()
+• stop_teaching_mode()
+• capture_single_frame()
+• set_flash_settings()"]
+		enhanced_controller -> camera_interface
+	}
+}

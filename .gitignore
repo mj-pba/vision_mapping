@@ -1,0 +1,99 @@
+# =============================================================================
+# Python
+# =============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+sdist/
+
+# Installers
+*.msi
+*.exe
+*.pkg
+
+# =============================================================================
+# Virtual Environments
+# =============================================================================
+
+.venv/
+venv/
+env/
+ENV/
+py313/
+
+# =============================================================================
+# IDEs & Editors
+# =============================================================================
+
+# VSCode
+.vscode/
+
+# PyCharm / IntelliJ
+.idea/
+
+# Spyder
+.spyderproject.cfg
+.spyproject/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# =============================================================================
+# Logs & Outputs
+# =============================================================================
+
+*.log
+*_log.csv
+logs/
+
+# =============================================================================
+# Build Artifacts
+# =============================================================================
+
+*.spec.bak
+*.manifest
+
+# PyInstaller output (keep the .spec file, ignore generated output)
+dist/
+build/
+
+# =============================================================================
+# OS-specific
+# =============================================================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =============================================================================
+# Project-specific
+# =============================================================================
+
+# Sensitive config / credentials
+*.env
+.env
+secrets.*
+
+# HALCON runtime files (generated)
+*.hobj
+*.hcomp

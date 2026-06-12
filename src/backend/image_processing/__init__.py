@@ -1,0 +1,1 @@
+from backend.image_processing.scan_and_capture import scan_grid

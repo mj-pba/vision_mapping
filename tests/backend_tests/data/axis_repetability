@@ -1,0 +1,77 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.ticker as ticker
+
+pixel_size_in_um = 0.475
+
+# Load the CSV file into a pandas DataFrame
+csv_file = r"C:\Users\mj.j\OneDrive - PBA Systems Pte. Ltd\GitHub\Github\2024_10_07_13_09_51\log_file.csv"
+#csv_file = 'log_file.csv'  # Replace with your CSV file path
+df = pd.read_csv(csv_file)
+
+# Convert the DataFrame to a NumPy array
+data_array = df.to_numpy()
+
+# Create a single figure for all plots
+plt.figure(figsize=(12, 8))
+
+# Define colors for P and N
+colors_for_P = [
+    'navy', 'darkred', 'forestgreen', 'darkorange', 'indigo',
+    'maroon', 'purple', 'darkslategray', 'saddlebrown', 'mediumblue',
+    'teal', 'darkviolet', 'crimson', 'chocolate', 'black', 'darkkhaki'
+]
+
+colors_for_N = [
+    'lightblue', 'lightcoral', 'lightgreen', 'yellow', 'lightsalmon',
+    'lightpink', 'lightgray', 'thistle', 'peachpuff', 'lavender',
+    'powderblue', 'yellow', 'red', 'mistyrose', 'palegreen', 'wheat'
+]
+
+for run in range(16):
+    cycle_image_count = 284    
+
+    value_p_start = run * cycle_image_count + 1
+    value_p_end = run * cycle_image_count + 141
+
+    value_n_start = run * cycle_image_count + 143
+    value_n_end = run * cycle_image_count + 283
+
+    values_P = data_array[value_p_start:value_p_end] 
+    values_N = data_array[value_n_start:value_n_end]
+
+    # Extract X and Y values for P and N
+    X_values_P = values_P[:, 4]  # Column 4 position index
+    Y_values_P = (values_P[:, 11] - 1296) * -0.4403  # Column 11 position value
+
+    X_values_N = values_N[:, 4]  # Column 4 position index
+    Y_values_N = (values_N[:, 11] - 1296) * -0.4403  # Column 11 position value
+
+    # Plot the data for each run
+    plt.plot(X_values_P, Y_values_P, marker='.', linestyle='-', color=colors_for_P[run], label=f'{str(run)}P', linewidth=1)
+    plt.plot(X_values_N, Y_values_N, marker='.', linestyle='-', color=colors_for_N[run], label=f'{str(run)}N', linewidth=1)
+
+# Add labels and title
+plt.xlabel('X position in mm')
+plt.ylabel('Position error in um')
+plt.title('Position error vs X position')
+
+# Set Y-axis limits
+plt.ylim(-8, 2)  # Set Y-axis from -8 to +2
+
+# Set major and minor ticks for the Y axis
+ax = plt.gca()  # Get the current axes
+ax.yaxis.set_major_locator(ticker.MultipleLocator(1))  # Major ticks every 1 unit
+ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.2))  # Minor ticks every 0.2 unit
+
+# Show the grid for both major and minor ticks
+plt.grid(which='both', color='gray', linestyle='--', linewidth=0.5)  # Major grid
+plt.grid(which='minor', linestyle=':', linewidth=0.5)  # Minor grid
+
+# Show the legend outside the plot
+plt.legend(loc='upper left', bbox_to_anchor=(1, 1), fontsize='small', title='Legend', title_fontsize='medium')
+
+# Save the combined plot
+plt.savefig("combined_plot_with_subgrid.png", dpi=300, bbox_inches='tight')  # Use bbox_inches='tight' to adjust layout
+plt.show()

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="24.05.0.0">
+<procedure name="main">
+<interface/>
+<body>
+<l>read_image (Image, '1')</l>
+<l>edges_sub_pix (Image, Edges, 'lanser2', 0.5, 8, 50)</l>
+<l>dev_set_colored (12)</l>
+<l>dev_clear_window ()</l>
+<l>dev_display (Edges)</l>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

@@ -1,0 +1,103 @@
+
+* This example shows the usage of the metrology model
+* to measure circles and rectangles with subpixel
+* accuracy under challenging conditions easily.
+* 
+* Display initializations
+dev_update_off ()
+read_image (Image, 'pads')
+get_image_size (Image, Width, Height)
+dev_close_window ()
+dev_open_window_fit_image (Image, 0, 0, -1, -1, WindowHandle)
+set_display_font (WindowHandle, 14, 'mono', 'true', 'false')
+* 
+* Define the approximate position and the measure
+* tolerance for the circles
+RowCircle := [52:89:500]
+CircleInitRow := [RowCircle,RowCircle]
+CircleInitColumn := [gen_tuple_const(6,348),gen_tuple_const(6,438)]
+gen_cross_contour_xld (Cross1, CircleInitRow, CircleInitColumn, 6, 0.785398)
+CircleInitRadius := [gen_tuple_const(6,23),gen_tuple_const(6,23)]
+CircleRadiusTolerance := 12
+* Define the approximate position and the measure
+* tolerance for the rectangles
+RectangleInitRow := [410, 410]
+RectangleInitColumn := [215, 562]
+RectangleInitPhi := [0, 0]
+RectangleInitLength1 := [85, 85]
+RectangleInitLength2 := [88, 88]
+RectangleTolerance := 10
+* 
+* Prepare the metrology model data structure
+create_metrology_model (MetrologyHandle)
+* Setting the image width in advance is not
+* necessary, but improves the runtime of the
+* first measurement.
+set_metrology_model_image_size (MetrologyHandle, Width, Height)
+* Add the metrology rectangle objects to the model
+* as defined above
+add_metrology_object_rectangle2_measure (MetrologyHandle, RectangleInitRow, RectangleInitColumn, RectangleInitPhi, RectangleInitLength1, RectangleInitLength2, RectangleTolerance, 5, .5, 1, [], [], MetrologyRectangleIndices)
+* Add the metrology circle objects to the model
+* as defined above
+add_metrology_object_circle_measure (MetrologyHandle, CircleInitRow, CircleInitColumn, CircleInitRadius, CircleRadiusTolerance, 5, 1.5, 2, [], [], MetrologyCircleIndices)
+* It is possible to measure more than one circle/rectangle/line/ellipse
+* instance per metrology object in one call.
+* Since we like to measure two circles per object,
+* we set 'num_instances' to 2.
+set_metrology_object_param (MetrologyHandle, MetrologyCircleIndices, 'num_instances', 2)
+* Setting 'measure_transition' to 'uniform' assures
+* that only consistent circles are returned, that have
+* either only edges from bright to dark or vice versa.
+* Since the consistency check increases runtime, it is
+* switched off by default.
+* In this example however, it is safer to switch it on,
+* because both negative and positive edges are present.
+set_metrology_object_param (MetrologyHandle, MetrologyCircleIndices, 'measure_transition', 'uniform')
+* Setting the minimum score can make the results more robust
+set_metrology_object_param (MetrologyHandle, MetrologyCircleIndices, 'min_score', .9)
+* 
+* Perform the measurement
+* 
+apply_metrology_model (Image, MetrologyHandle)
+* 
+get_metrology_object_result (MetrologyHandle, MetrologyRectangleIndices, 'all', 'result_type', 'all_param', RectangleParameter)
+* Extract the parameters for better readability
+Sequence := [0:5:|RectangleParameter| - 1]
+RectangleRow := RectangleParameter[Sequence]
+RectangleColumn := RectangleParameter[Sequence + 1]
+RectanglePhi := RectangleParameter[Sequence + 2]
+RectangleLength1 := RectangleParameter[Sequence + 3]
+RectangleLength2 := RectangleParameter[Sequence + 4]
+* 
+* Access the results of the circle measurement
+get_metrology_object_result (MetrologyHandle, MetrologyCircleIndices, 'all', 'result_type', 'all_param', CircleParameter)
+* Extract the parameters for better readability
+Sequence := [0:3:|CircleParameter| - 1]
+CircleRow := CircleParameter[Sequence]
+CircleColumn := CircleParameter[Sequence + 1]
+CircleRadius := CircleParameter[Sequence + 2]
+* 
+* Display the results
+* 
+* Get measured contours
+get_metrology_object_result_contour (Contours, MetrologyHandle, 'all', 'all', 1.5)
+* Get the contours of the measure regions
+* and the coordinates of the edge points
+* that were the basis for fitting the circles and rectangles
+get_metrology_object_measures (Contour, MetrologyHandle, 'all', 'all', Row1, Column1)
+gen_cross_contour_xld (Cross, Row1, Column1, 6, 0.785398)
+* Display everything
+Color := ['gray', 'cyan', 'green']
+dev_display (Image)
+dev_set_line_width (1)
+dev_set_color (Color[0])
+dev_display (Contour)
+dev_set_color (Color[1])
+dev_display (Cross)
+dev_set_line_width (2)
+dev_set_color (Color[2])
+dev_display (Contours)
+Message := Color[2] + ': Measurement result'
+Message[1] := Color[1] + ': Edge candidate points'
+Message[2] := Color[0] + ': Measure regions'
+disp_message (WindowHandle, Message, 'window', 12, 12, 'black', 'true')

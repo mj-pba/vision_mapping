@@ -1,0 +1,90 @@
+* This example program shows how fit_rectangle2_contour_xld can be used to
+* detect manufacturing errors of punched holes in a metal part.  The errors
+* show up as small protrusions of the metal into the hole.  They can be detected
+* by fitting rectangles to the edges of the hole robustly (i.e., with outlier
+* suppression) and the calculating the distances of the edges to the rectangle
+* sides using dist_rectangle2_contour_points_xld.  Since the corners of the
+* holes are slightly rounded, some extra processing must be performed to
+* disregard the corners in the check for errors.
+dev_update_off ()
+read_image (Image, 'punched_holes')
+get_image_size (Image, Width, Height)
+dev_close_window ()
+dev_open_window (0, 0, Width, Height, 'black', WindowHandle)
+set_display_font (WindowHandle, 16, 'mono', 'true', 'false')
+dev_display (Image)
+* Since the metal part is backlit, the processing speed can be increased
+* significantly by constructing a ROI for the subpixel-precise edge extraction
+* that is as small as possible.  This can easily be achieved by thresholding and
+* morphology.
+fast_threshold (Image, Region, 128, 255, 10)
+boundary (Region, Border, 'inner')
+dilation_rectangle1 (Border, EdgeROI, 7, 7)
+reduce_domain (Image, EdgeROI, ImageReduced)
+* Perform the edge extraction.
+edges_sub_pix (ImageReduced, Edges, 'canny', 1.7, 40, 120)
+* Remove edge fragments that are too short.
+select_shape_xld (Edges, RectangleEdges, 'contlength', 'and', 500, 100000)
+* Fit rectangles to the holes' edges using the outlier suppression of Tukey.
+fit_rectangle2_contour_xld (RectangleEdges, 'tukey', -1, 0, 0, 3, 2, Row, Column, Phi, Length1, Length2, PointOrder)
+* Create rectangles with the fitted parameters for visualization purposes.
+gen_rectangle2_contour_xld (Rectangles, Row, Column, Phi, Length1, Length2)
+dev_set_color ('yellow')
+dev_display (Rectangles)
+* Check whether the holes are OK.
+count_obj (RectangleEdges, Number)
+for I := 0 to Number - 1 by 1
+    select_obj (RectangleEdges, RectangleEdge, I + 1)
+    * Get the contour's coordinates.
+    get_contour_xld (RectangleEdge, Rows, Cols)
+    * Create a rectangle with the appropriate rectangle parameters.
+    gen_rectangle2_contour_xld (Rect, Row[I], Column[I], Phi[I], Length1[I], Length2[I])
+    * Get the coordinates of the rectangle's corners.
+    get_contour_xld (Rect, RowC, ColC)
+    * Calculate the distances of all the contour points to the four corners of the
+    * rectangle.
+    D1 := sqrt((Rows - RowC[0]) * (Rows - RowC[0]) + (Cols - ColC[0]) * (Cols - ColC[0]))
+    D2 := sqrt((Rows - RowC[1]) * (Rows - RowC[1]) + (Cols - ColC[1]) * (Cols - ColC[1]))
+    D3 := sqrt((Rows - RowC[2]) * (Rows - RowC[2]) + (Cols - ColC[2]) * (Cols - ColC[2]))
+    D4 := sqrt((Rows - RowC[3]) * (Rows - RowC[3]) + (Cols - ColC[3]) * (Cols - ColC[3]))
+    * The distance of the contour points to the corners of the rectangle is given
+    * by the minimum of the four distances.  This distance is used to exclude
+    * contour points that are too close to the corners from the check for errors.
+    DistCorner := min2(min2(D1,D2),min2(D3,D4))
+    * Calculate the distances of the contour points of the rectangle.
+    dist_rectangle2_contour_points_xld (RectangleEdge, 0, Row[I], Column[I], Phi[I], Length1[I], Length2[I], Dist)
+    * Check whether the hole is OK by examining the distances of the contour
+    * points to the rectangle.  A hole is OK if all points that lie more than seven
+    * pixels from the corners have a distance of less than one pixel to the fitted
+    * rectangle.  To do so, we could use the following code:
+*     RectangleOK := true
+*     for J := 0 to |Dist| - 1 by 1
+*         if (DistCorner[J] > 7.0 and Dist[J] > 1.0)
+*             RectangleOK := false
+*             break
+*         endif
+*     endfor
+    * A much faster way to do this in HDevelop is to generate a mask that
+    * contains 0 for all points that should not be taken into account and 1
+    * otherwise.  To do so, we subtract the minimum distance of 7.0 from the
+    * distances to the corners and take the maximum of 0.0 and the resulting
+    * values.  This sets all the distances that are too close to the corners to 0.
+    * To set all other values to 1, we can simply take the sign of the values.
+    Mask := sgn(max2(DistCorner - 7.0,0.0))
+    * We can now multiply the distances to the rectangle with the mask and
+    * check whether the maximum distance is smaller than the maximum allowed
+    * distance of 1.0.
+    RectangleOK := max(Dist * Mask) <= 1.0
+    * Display whether the hole is OK.
+    if (RectangleOK)
+        dev_set_color ('green')
+        get_string_extents (WindowHandle, 'OK', Ascent, Descent, Width, Height)
+        set_tposition (WindowHandle, Row[I] - Height / 2, Column[I] - Width / 2)
+        write_string (WindowHandle, 'OK')
+    else
+        dev_set_color ('red')
+        get_string_extents (WindowHandle, 'Not OK', Ascent, Descent, Width, Height)
+        set_tposition (WindowHandle, Row[I] - Height / 2, Column[I] - Width / 2)
+        write_string (WindowHandle, 'Not OK')
+    endif
+endfor
