@@ -126,6 +126,8 @@ Requirement Refs: [REQ-XX, FEAT-XX]
 | [TASK-002](TASK-002_%23NN_Glass-Certificate-Repeatability.md) | Task | #NN | Glass Certificate Repeatability Verification | 🔵 Open | REQ-002.4 |
 | [DOCS-001](DOCS-001_%2357_SOP-Adoption.md) | Docs | #57 | SOP Adoption & Git Issue Tracking | 🔄 In Progress | REQ-008 |
 | [TASK-003](TASK-003_%23NN_Document-Test-Features.md) | Task | #NN | Document & Test All Implemented Features | 🔵 Open | All |
+| [TASK-005](TASK-005_%2359_Externalize-Recipe-Data.md) | Task | #59 | Externalize Recipe Data — Move `src/recipes/` Outside Source Tree | 🔵 Open | — |
+| [FEAT-011](FEAT-011_%2360_First-Run-Recipe-Initialization.md) | Feature | #60 | First-Run Recipe Data Initialization | 🔵 Open | TASK-005 |
 
 ### Future Enhancements (Backlog)
 
